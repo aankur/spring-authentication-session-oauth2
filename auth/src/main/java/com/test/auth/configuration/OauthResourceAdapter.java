@@ -12,21 +12,23 @@ public class OauthResourceAdapter extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
 
+        http.csrf().disable();
         http.httpBasic().disable();
 
-        http
+        /*http
                 .authorizeRequests()
-                .antMatchers("/api/v1/auth/login","/api/v1/auth/logout","/api/v1/auth/unauthenticated")
-                .permitAll();
+                .antMatchers("/web/v1/auth/login","/web/v1/auth/logout","/web/v1/auth/unauthenticated")
+                .permitAll();*/
 
-        http
+        /*http
                 .authorizeRequests()
                 .antMatchers("/api/v1/auth/oauth/**")
-                .permitAll();
+                .permitAll();*/
 
         http
+                .antMatcher("/api/**")
                 .authorizeRequests()
-                .antMatchers("/api/**")
+                .anyRequest()
                 .authenticated();
     }
 }

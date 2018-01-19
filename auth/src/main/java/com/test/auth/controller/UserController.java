@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 @RestController
-@RequestMapping(value = "/api/v1/auth")
+@RequestMapping(value = {"/web/v1/auth","/api/v1/auth"})
 public class UserController {
 
 
