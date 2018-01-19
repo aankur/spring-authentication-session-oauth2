@@ -10,7 +10,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @Configuration
 @EnableRedisHttpSession
 @EnableWebSecurity(debug = true)
-@Order(3)
+@Order(1)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
@@ -19,8 +19,15 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable();
 
-        http.authorizeRequests().antMatchers("/api/v1/service/unauthenticated").permitAll();
-        http.authorizeRequests().antMatchers("/api/v1/service/**").authenticated();
+        http
+                .antMatcher("/web/**")
+                .authorizeRequests()
+                .antMatchers("/web/v1/auth/unauthenticated")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/web/**")
+                .authenticated();
     }
 
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping(value = "/api/v1/service")
+@RequestMapping(value = {"/web/v1/service","/api/v1/service"})
 public class ServiceController {
 
     @RequestMapping(value = "unauthenticated")

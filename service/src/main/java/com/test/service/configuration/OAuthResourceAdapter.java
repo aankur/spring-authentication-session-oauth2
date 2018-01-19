@@ -14,7 +14,14 @@ public class OAuthResourceAdapter extends ResourceServerConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable();
 
-        http.authorizeRequests().antMatchers("/api/v1/service/unauthenticated").permitAll();
-        http.authorizeRequests().antMatchers("/api/v1/service/**").authenticated();
+        http
+                .antMatcher("/api/**")
+                .authorizeRequests()
+                .antMatchers("/api/v1/service/unauthenticated")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/**")
+                .authenticated();
     }
 }
