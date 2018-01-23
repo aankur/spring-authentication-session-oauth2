@@ -15,10 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 @EnableRedisHttpSession(redisFlushMode = RedisFlushMode.IMMEDIATE)
 @EnableWebSecurity(debug = true)
-@Order(3)
+@Order(2)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
@@ -31,6 +33,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.httpBasic().disable();
+        http.requestMatcher(new AntPathRequestMatcherWrapper("/api/**") {
+            @Override
+            protected boolean precondition(HttpServletRequest request) {
+                return !String.valueOf(request.getHeader("Authorization")).contains("Bearer");
+            }
+        })
+                .authorizeRequests()
+                .antMatchers("/api/v1/auth/login","/api/v1/auth/logout","/api/v1/auth/unauthenticated")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/**")
+                .authenticated();
+        /*http.csrf().disable();
         http.httpBasic().disable();
 
         http
@@ -46,7 +63,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/api/**")
-                .authenticated();
+                .authenticated();*/
     }
 
 
