@@ -7,10 +7,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 @EnableRedisHttpSession
 @EnableWebSecurity(debug = true)
-@Order(3)
+@Order(2)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
@@ -19,8 +21,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable();
 
-        http.authorizeRequests().antMatchers("/api/v1/service/unauthenticated").permitAll();
-        http.authorizeRequests().antMatchers("/api/v1/service/**").authenticated();
+        http.requestMatcher(new AntPathRequestMatcherWrapper("/api/**") {
+            @Override
+            protected boolean precondition(HttpServletRequest request) {
+                return !String.valueOf(request.getHeader("Authorization")).contains("Bearer");
+            }
+        })
+                .authorizeRequests()
+                .antMatchers("/api/v1/service/unauthenticated")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/v1/service/**")
+                .authenticated();
+
     }
 
 }

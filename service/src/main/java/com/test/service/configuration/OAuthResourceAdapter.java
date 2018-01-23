@@ -5,6 +5,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
 @EnableResourceServer
 public class OAuthResourceAdapter extends ResourceServerConfigurerAdapter {
@@ -14,7 +16,18 @@ public class OAuthResourceAdapter extends ResourceServerConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable();
 
-        http.authorizeRequests().antMatchers("/api/v1/service/unauthenticated").permitAll();
-        http.authorizeRequests().antMatchers("/api/v1/service/**").authenticated();
+        http.requestMatcher(new AntPathRequestMatcherWrapper("/api/**") {
+            @Override
+            protected boolean precondition(HttpServletRequest request) {
+                return String.valueOf(request.getHeader("Authorization")).contains("Bearer");
+            }
+        })
+                .authorizeRequests()
+                .antMatchers("/api/v1/service/unauthenticated")
+                .permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/v1/service/**")
+                .authenticated();
     }
 }
